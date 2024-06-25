@@ -7,7 +7,7 @@ account = "hdev"
 region  = "euw2"
 
 # Application details
-application = "end-to-end-pilot"
+application = "e2e-pilot"
 environment = "development"
 
 instance_count = 1

@@ -53,7 +53,7 @@ data "vault_generic_secret" "internal_cidrs" {
 }
 
 data "vault_generic_secret" "ec2_data" {
-  path = "applications/${var.aws_account}-${var.aws_region}/unix-development/${var.application}/ec2"
+  path = "applications/${var.aws_account}-${var.aws_region}/e2e-pilot/${var.application}/ec2"
 }
 
 data "vault_generic_secret" "kms_keys" {
@@ -110,8 +110,8 @@ data "template_cloudinit_config" "userdata_config" {
   }
 }
 
-data "aws_security_group" "end_to_end_pilot_sg" {
-  for_each = toset(var.end_to_end_pilot_sg)
+data "aws_security_group" "e2e_pilot_sg" {
+  for_each = toset(var.e2e_pilot_sg)
   filter {
     name   = "group-name"
     values = [each.value]

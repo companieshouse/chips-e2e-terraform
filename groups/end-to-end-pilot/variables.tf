@@ -252,7 +252,7 @@ variable "netapp_ips" {
 # ------------------------------------------------------------------------------
 # UNIX Development SG variables
 # ------------------------------------------------------------------------------
-variable "end_to_end_pilot_sg" {
+variable "e2e_pilot_sg" {
   type        = list(any)
   description = "List of End-To-End Pilot Security Groups"
   default     = []
