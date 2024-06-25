@@ -71,7 +71,7 @@ locals {
     TimeoutSeconds     = "3600"
   }
 
-source_security_group_id = [for item in data.aws_security_group.e2e_pilot_sg : item.id]
+source_security_group_id = [for item in data.aws_security_group.chips_e2e_pilot_sg : item.id]
 
   default_tags = {
     Terraform   = "true"
