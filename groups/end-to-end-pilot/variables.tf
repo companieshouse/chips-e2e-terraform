@@ -250,7 +250,7 @@ variable "netapp_ips" {
 
 
 # ------------------------------------------------------------------------------
-# UNIX Development SG variables
+# CHIPS E2E Pilot SG variables
 # ------------------------------------------------------------------------------
 variable "chips_e2e_pilot_sg" {
   type        = list(any)

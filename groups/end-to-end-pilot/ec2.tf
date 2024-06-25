@@ -42,7 +42,7 @@ module "ec2_security_group" {
       from_port                = 1521
       to_port                  = 1522
       protocol                 = "tcp"
-      description              = "UNIX Development Security Group"
+      description              = "CHIPS E2E Pilot Security Group"
       source_security_group_id = group
     }
   ]
