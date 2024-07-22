@@ -1,50 +1,17 @@
-# ------------------------------------------------------------------------------
-# Data
-# ------------------------------------------------------------------------------
-data "aws_caller_identity" "current" {}
-
-data "vault_generic_secret" "account_ids" {
-  path = "aws-accounts/account-ids"
+data "aws_ec2_managed_prefix_list" "shared_services_management" {
+  name = "shared-services-management-cidrs"
 }
 
 
-data "aws_subnet_ids" "data" {
-  vpc_id = data.aws_vpc.vpc.id
+data "aws_route53_zone" "chips-e2e-pilot" {
+  name   = local.dns_zone
+  vpc_id = data.aws_vpc.finance.id
+}
+
+data "aws_vpc" "finance" {
   filter {
     name   = "tag:Name"
-    values = ["sub-data-*"]
-  }
-}
-
-data "aws_subnet" "data_subnets" {
-  for_each = data.aws_subnet_ids.data.ids
-
-  id = each.value
-}
-
-data "aws_vpc" "vpc" {
-  tags = {
-    Name = "vpc-${var.aws_account}"
-  }
-}
-
-data "aws_ami" "oracle_12" {
-  owners = [data.vault_generic_secret.account_ids.data["development"]]
-
-  most_recent = true
-
-  filter {
-    name = "name"
-    values = [
-      var.ami_name,
-    ]
-  }
-
-  filter {
-    name = "state"
-    values = [
-      "available",
-    ]
+    values = ["vpc-finance-${var.environment}"]
   }
 }
 
@@ -52,72 +19,62 @@ data "vault_generic_secret" "internal_cidrs" {
   path = "aws-accounts/network/internal_cidr_ranges"
 }
 
-data "vault_generic_secret" "ec2_data" {
-  path = "applications/${var.aws_account}-${var.aws_region}/chips-e2e-pilot/${var.application}/ec2"
-}
+data "aws_subnets" "application" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.finance.id]
+  }
 
-data "vault_generic_secret" "kms_keys" {
-  path = "aws-accounts/${var.aws_account}/kms"
-}
-
-data "vault_generic_secret" "security_kms_keys" {
-  path = "aws-accounts/security/kms"
-}
-
-data "aws_kms_key" "ebs" {
-  key_id = "alias/${var.account}/${var.region}/ebs"
-}
-
-data "vault_generic_secret" "shared_services_s3" {
-  path = "aws-accounts/shared-services/s3"
-}
-
-data "vault_generic_secret" "security_s3_buckets" {
-  path = "aws-accounts/security/s3"
-}
-
-data "vault_generic_secret" "ssm" {
-  path = "aws-accounts/${var.aws_account}/ssm"
-}
-
-data "aws_route53_zone" "private_zone" {
-  name         = local.internal_fqdn
-  private_zone = true
-}
-
-data "template_file" "userdata" {
-  template = file("${path.module}/templates/user_data.tpl")
-
-  count = var.instance_count
-
-  vars = {
-    ENVIRONMENT          = title(var.environment)
-    APPLICATION_NAME     = var.application
-    ANSIBLE_INPUTS       = jsonencode(merge(local.ansible_inputs, { hostname = format("%s-%02d", var.application, count.index + 1) }))
-    ISCSI_INITIATOR_NAME = local.iscsi_initiator_names[count.index]
+  filter {
+    name   = "tag:Name"
+    values = [var.application_subnet_pattern]
   }
 }
 
-data "template_cloudinit_config" "userdata_config" {
+data "aws_subnet" "application" {
+  count = length(data.aws_subnets.application.ids)
+  id    = tolist(data.aws_subnets.application.ids)[count.index]
+}
+
+data "aws_ami" "chips-e2e-pilot-base-ami" {
+  owners      = [var.ami_owner_id]
+  most_recent = true
+  name_regex  = "^${var.service_subtype}-${var.service}-ami-\\d.\\d.\\d"
+
+  filter {
+    name   = "name"
+    values = ["${var.service_subtype}-${var.service}-ami-${var.ami_version_pattern}"]
+  }
+}
+
+data "cloudinit_config" "config" {
   count = var.instance_count
 
   gzip          = true
   base64_encode = true
 
   part {
-    content_type = "text/x-shellscript"
-    content      = data.template_file.userdata[count.index].rendered
+    content_type = "text/cloud-config"
+    content      = templatefile("${path.module}/cloud-init/templates/system-config.yml.tpl", {})
+  }
+
+  part {
+    content_type = "text/cloud-config"
+    content = templatefile("${path.module}/cloud-init/templates/bootstrap-commands.yml.tpl", {
+      instance_hostname = "${var.service_subtype}-${var.service}-${var.environment}-${count.index + 1}"
+      lvm_block_devices = var.lvm_block_devices
+    })
   }
 }
 
-data "aws_security_group" "chips_e2e_pilot_sg" {
-  for_each = toset(var.chips_e2e_pilot_sg)
-  filter {
-    name   = "group-name"
-    values = [each.value]
-  }
+data "vault_generic_secret" "kms_keys" {
+  path = "aws-accounts/${var.aws_account}/kms"
 }
 
-data "vault_generic_secret" "chs_subnet" {
-  path = "aws-accounts/network/${var.aws_account}/chs/application-subnets"
+data "vault_generic_secret" "security_s3_buckets" {
+  path = "aws-accounts/security/s3"
+}
+
+data "vault_generic_secret" "security_kms_keys" {
+  path = "aws-accounts/security/kms"
 }

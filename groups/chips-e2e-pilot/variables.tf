@@ -1,259 +1,101 @@
-# ------------------------------------------------------------------------------
-# Vault Variables
-# ------------------------------------------------------------------------------
-variable "vault_username" {
+variable "ami_owner_id" {
   type        = string
-  description = "Username for connecting to Vault - usually supplied through TF_VARS"
+  description = "The AMI owner ID."
 }
 
-variable "vault_password" {
+variable "ami_version_pattern" {
   type        = string
-  description = "Password for connecting to Vault - usually supplied through TF_VARS"
+  description = "The pattern to use when filtering for AMI version by name."
+  default     = "*"
 }
 
-# ------------------------------------------------------------------------------
-# AWS Variables
-# ------------------------------------------------------------------------------
-variable "aws_region" {
+variable "application_subnet_pattern" {
   type        = string
-  description = "The AWS region in which resources will be administered"
-}
-
-variable "aws_profile" {
-  type        = string
-  description = "The AWS profile to use"
+  description = "The pattern to use when filtering for application subnets by 'Name' tag."
+  default     = "sub-application-*"
 }
 
 variable "aws_account" {
   type        = string
-  description = "The name of the AWS Account in which resources will be administered"
+  description = "The name of the AWS account in which resources will be provisioned."
 }
 
-# ------------------------------------------------------------------------------
-# AWS Variables - Shorthand
-# ------------------------------------------------------------------------------
-
-variable "account" {
-  type        = string
-  description = "Short version of the name of the AWS Account in which resources will be administered"
+variable "default_log_retention_in_days" {
+  type        = number
+  description = "The default log retention period in days to be used for CloudWatch log groups."
+  default     = 7
 }
 
-variable "region" {
+variable "dns_zone_suffix" {
   type        = string
-  description = "Short version of the name of the AWS region in which resources will be administered"
-}
-
-# ------------------------------------------------------------------------------
-# Application Variables
-# ------------------------------------------------------------------------------
-
-
-variable "application" {
-  type        = string
-  description = "The name of the application"
+  description = "The common DNS hosted zone suffix used across accounts."
+  default     = "finance.aws.internal"
 }
 
 variable "environment" {
   type        = string
-  description = "The name of the environment"
-}
-
-variable "domain_name" {
-  type        = string
-  default     = "*.companieshouse.gov.uk"
-  description = "Domain Name for ACM Certificate"
-}
-
-
-# ------------------------------------------------------------------------------
-# EC2 Variables
-# ------------------------------------------------------------------------------
-variable "ami_name" {
-  type        = string
-  default     = "oracle-12-*"
-  description = "Name of the AMI to use in the Auto Scaling configuration for email servers"
-}
-
-variable "ami_id" {
-  type        = string
-  description = "Set this to null to use the latest AMI, set the default to an AMI Id to hardcode and always use that AMI"
-  default     = null
-}
-
-variable "vpc_sg_cidr_blocks_oracle" {
-  type        = list(any)
-  description = "Security group cidr blocks for Oracle"
-  default     = []
-}
-
-variable "vpc_sg_cidr_blocks_ssh" {
-  type        = list(any)
-  description = "Security group cidr blocks for ssh"
-  default     = []
-}
-
-# ------------------------------------------------------------------------------
-# EC2 Variables
-# ------------------------------------------------------------------------------
-variable "instance_size" {
-  type        = string
-  description = "The size of the ec2 instances"
+  description = "The environment name to be used when provisioning AWS resources."
 }
 
 variable "instance_count" {
-  type        = string
-  description = "The number of ec2 instances to create"
-}
-
-variable "cloudwatch_logs" {
-  type        = map(any)
-  default     = null
-  description = "Map of log files to be collected by Cloudwatch Logs"
-}
-
-variable "cloudwatch_oracle_log_groups" {
-  type        = list(string)
-  default     = []
-  description = "A list of CloudWatch Log Groups that will be used to receive Oracle log data"
-}
-
-variable "cloudwatch_namespace" {
-  type        = string
-  default     = null
-  description = "A custom namespace to define for CloudWatch custom metrics such as memory and disk"
-}
-
-variable "default_log_group_retention_in_days" {
   type        = number
-  default     = 180
-  description = "Total days to retain logs in CloudWatch log group if not specified for specific logs"
-}
-
-variable "availability_zones" {
-  type        = list(string)
-  default     = null
-  description = "List of availability zone names (e.g. [eu-west-2a, eu-west-2b]) to deploy instances into, usually to meet constraints such as remote storage locality. Leaving null will deploy across all matching subnets/zones in the provided VPC"
-}
-
-# ------------------------------------------------------------------------------
-# NFS Variables
-# ------------------------------------------------------------------------------
-
-variable "nfs_server" {
-  type        = string
-  description = "The name or IP of the environment specific NFS server"
-  default     = null
-}
-
-variable "nfs_mount_destination_parent_dir" {
-  type        = string
-  description = "The parent folder that all NFS shares should be mounted inside on the EC2 instance"
-  default     = "/mnt"
-}
-
-variable "nfs_mounts" {
-  type        = map(any)
-  description = "A map of objects which contains mount details for each mount path required."
-  default     = {}
-  #   SH_NFSTest = {                  # The name of the NFS Share from the NFS Server
-  #     local_mount_point = "folder", # The name of the local folder to mount to if the share name is not wanted
-  #     mount_options = [             # Traditional mount options as documented for any NFS Share mounts
-  #       "rw",
-  #       "wsize=8192"
-  #     ]
-  #   }
-  # }
-}
-
-# ------------------------------------------------------------------------------
-# Ansible SSM variables
-# ------------------------------------------------------------------------------
-
-variable "ansible_ssm_git_repo_name" {
-  type        = string
-  description = "Name of the repository containing Ansible code to be downloaded."
-}
-
-variable "ansible_ssm_git_repo_owner" {
-  type        = string
-  description = "Name of the repository owner containing Ansible code to be downloaded."
-}
-
-variable "ansible_ssm_git_repo_path" {
-  type        = string
-  description = "Directory prefix of code to be downloaded"
-  default     = "ansible/"
-}
-
-variable "ansible_ssm_git_repo_options" {
-  type        = string
-  description = "Options for git code pull, e.g. 'branch:master'"
-  default     = "branch:master"
-}
-
-variable "ansible_ssm_apply_only_at_cron_interval" {
-  type        = string
-  description = "If false, applies on terraform apply, then on provided schedule expression. If true first apply will be at the next occurance of the schedule expression."
-  default     = true
-}
-
-variable "ansible_ssm_check_schedule_expression" {
-  type        = string
-  description = "SSM schedule expression for running playbook in check mode, see https://docs.aws.amazon.com/systems-manager/latest/userguide/reference-cron-and-rate-expressions.html for syntax."
-  default     = null
-}
-
-variable "ansible_ssm_apply_schedule_expression" {
-  type        = string
-  description = "SSM schedule expression for running playbook in apply mode, see https://docs.aws.amazon.com/systems-manager/latest/userguide/reference-cron-and-rate-expressions.html for syntax."
-  default     = null
-}
-
-variable "ansible_ssm_verbose_level" {
-  type        = string
-  description = "Verbosity flag to passs to ansible command, e.g. '-v', '-vvv'"
-  default     = "-v"
-}
-
-variable "maintenance_window_schedule_expression" {
-  type        = string
-  description = "The schedule of the Maintenance Window in the form of a cron or rate expression"
-  default     = null
-}
-variable "maintenance_window_duration" {
-  type        = number
-  description = "The duration of the Maintenance Window in hours"
-  default     = 2
-}
-variable "maintenance_window_cutoff" {
-  type        = number
-  description = "The number of hours before the end of the Maintenance Window that Systems Manager stops scheduling new tasks for execution"
+  description = "The number EC2 instances to create."
   default     = 1
 }
 
-variable "ssm_playbook_file_name" {
+variable "instance_type" {
   type        = string
-  description = "Name of the playbook file to run"
-  default     = "ssm-playbook.yml"
+  description = "The instance type to use for EC2 instances."
+  default     = "t3.small"
 }
 
-variable "ssm_requirements_file_name" {
-  type        = string
-  description = "Name of the requirements file to download Ansible dependancies"
-  default     = "requirements.yml"
-}
-
-variable "netapp_ips" {
-  type        = list(string)
-  description = "List of Netapp IP addresses to use for iscsi discovery."
-}
-
-
-# ------------------------------------------------------------------------------
-# CHIPS E2E Pilot SG variables
-# ------------------------------------------------------------------------------
-variable "chips_e2e_pilot_sg" {
-  type        = list(any)
-  description = "List of CHIPS E2E Pilot Security Groups"
+variable "lvm_block_devices" {
+  type = list(object({
+    aws_volume_size_gb              = string
+    filesystem_resize_tool          = string
+    lvm_logical_volume_device_node  = string
+    lvm_physical_volume_device_node = string
+  }))
+  description = "A list of objects representing LVM block devices; each LVM volume group is assumed to contain a single physical volume and each logical volume is assumed to belong to a single volume group; the filesystem for each logical volume will be expanded to use all available space within the volume group using the filesystem resize tool specified; block device configuration applies only on resource creation. Set the 'filesystem_resize_tool' and 'lvm_logical_volume_device_node' fields to empty strings if the block device contains no filesystem and should be excluded from the automatic filesystem resizing, such as when the block device represents a swap volume."
   default     = []
+}
+
+variable "region" {
+  type        = string
+  description = "The AWS region in which resources will be created."
+}
+
+variable "root_volume_size" {
+  type        = number
+  description = "The size of the root volume in gibibytes (GiB)."
+  default     = 20
+}
+
+variable "service" {
+  type        = string
+  description = "The service name to be used when creating AWS resources."
+  default     = "app"
+}
+
+variable "service_subtype" {
+  type        = string
+  description = "The service subtype name to be used when creating AWS resources."
+  default     = "e5"
+}
+
+variable "ssh_master_public_key" {
+  type        = string
+  description = "The SSH master public key; EC2 instance connect should be used for regular connectivity."
+}
+
+variable "team" {
+  type        = string
+  description = "The team name for ownership of this service."
+  default     = "Platform"
+}
+
+variable "user_data_merge_strategy" {
+  type        = string
+  default     = "list(append)+dict(recurse_array)+str()"
+  description = "Merge strategy to apply to user-data sections for cloud-init."
 }

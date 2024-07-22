@@ -1,31 +1,20 @@
 module "instance_profile" {
-  source = "git@github.com:companieshouse/terraform-modules//aws/instance_profile?ref=tags/1.0.278"
+  source = "git@github.com:companieshouse/terraform-modules//aws/instance_profile?ref=tags/1.0.281"
+  name   = "${var.service_subtype}-${var.service}-profile"
 
-  name       = format("%s", var.application)
-  enable_ssm = true
-  kms_key_refs = [
-    "alias/${var.account}/${var.region}/ebs",
-    local.ssm_kms_key_id,
-    local.ssm_logs_key_id,
+  # cw_log_group_arns = "%s:*"
+  enable_ssm        = true
+  # kms_key_refs      = local.instance_profile_kms_key_access_ids
+  # s3_buckets_write  = local.instance_profile_writable_buckets
+
+  custom_statements = [
+    {
+      sid       = "CloudWatchMetricsWrite"
+      effect    = "Allow"
+      resources = ["*"]
+      actions = [
+        "cloudwatch:PutMetricData"
+      ]
+    }
   ]
-  s3_buckets_read = [
-    local.resources_bucket_name,
-  ]
-  s3_buckets_write = [
-    local.session_manager_bucket_name,
-    local.ssm_data.ssm_logs_bucket_name
-  ]
-  cw_log_group_arns = length(local.log_groups) > 0 ? flatten([
-    formatlist(
-      "arn:aws:logs:%s:%s:log-group:%s:*:*",
-      var.aws_region,
-      data.aws_caller_identity.current.account_id,
-      concat(local.log_groups, var.cloudwatch_oracle_log_groups)
-    ),
-    formatlist("arn:aws:logs:%s:%s:log-group:%s:*",
-      var.aws_region,
-      data.aws_caller_identity.current.account_id,
-      concat(local.log_groups, var.cloudwatch_oracle_log_groups)
-    ),
-  ]) : null
 }
