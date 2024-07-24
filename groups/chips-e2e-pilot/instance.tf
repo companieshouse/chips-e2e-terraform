@@ -10,7 +10,7 @@ resource "aws_key_pair" "master" {
 
 resource "aws_security_group" "common" {
   name   = "common-${local.common_resource_name}"
-  vpc_id = data.aws_vpc.finance.id
+  vpc_id = data.aws_vpc.heritage.id
 
   ingress {
     description     = "Allow SSH connectivity for application deployments"
@@ -36,7 +36,7 @@ resource "aws_security_group" "common" {
 resource "aws_instance" "chips-e2e-pilot" {
   count = var.instance_count
 
-  ami             = data.aws_ami.chips-e2e-pilot-base-ami.id
+  ami             = data.aws_ami.rhel8-base.id
   instance_type   = var.instance_type
   key_name        = aws_key_pair.master.id
   # placement_group = aws_placement_group.fil.id
