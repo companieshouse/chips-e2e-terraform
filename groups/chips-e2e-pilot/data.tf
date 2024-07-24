@@ -5,13 +5,13 @@ data "aws_ec2_managed_prefix_list" "shared_services_management" {
 
 data "aws_route53_zone" "chips-e2e-pilot" {
   name   = local.dns_zone
-  vpc_id = data.aws_vpc.finance.id
+  vpc_id = data.aws_vpc.heritage.id
 }
 
-data "aws_vpc" "finance" {
+data "aws_vpc" "heritage" {
   filter {
     name   = "tag:Name"
-    values = ["vpc-finance-${var.environment}"]
+    values = ["vpc-heritage-${var.environment}"]
   }
 }
 
@@ -22,7 +22,7 @@ data "vault_generic_secret" "internal_cidrs" {
 data "aws_subnets" "application" {
   filter {
     name   = "vpc-id"
-    values = [data.aws_vpc.finance.id]
+    values = [data.aws_vpc.heritage.id]
   }
 
   filter {
@@ -36,14 +36,16 @@ data "aws_subnet" "application" {
   id    = tolist(data.aws_subnets.application.ids)[count.index]
 }
 
-data "aws_ami" "chips-e2e-pilot-base-ami" {
+data "aws_ami" "rhel8-base" {
   owners      = [var.ami_owner_id]
   most_recent = true
-  name_regex  = "^${var.service_subtype}-${var.service}-ami-\\d.\\d.\\d"
+  name_regex  = "rhel8-base-\\d.\\d.\\d"
+#  name_regex  = "^${var.service_subtype}-${var.service}-ami-\\d.\\d.\\d"
 
   filter {
     name   = "name"
-    values = ["${var.service_subtype}-${var.service}-ami-${var.ami_version_pattern}"]
+    values = ["rhel8-base-${var.ami_version_pattern}"]
+ #   values = ["${var.service_subtype}-${var.service}-ami-${var.ami_version_pattern}"]
   }
 }
 
