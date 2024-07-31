@@ -2,8 +2,7 @@ data "aws_ec2_managed_prefix_list" "shared_services_management" {
   name = "shared-services-management-cidrs"
 }
 
-
-data "aws_route53_zone" "chips-e2e-pilot" {
+data "aws_route53_zone" "private_zone" {
   name   = local.dns_zone
   vpc_id = data.aws_vpc.heritage.id
 }
@@ -36,11 +35,9 @@ data "aws_subnet" "application" {
   id    = tolist(data.aws_subnets.application.ids)[count.index]
 }
 
-data "aws_ami" "rhel8-base" {
-  owners      = [var.ami_owner_id]
+data "aws_ami" "rhel8_base_ami" {
   most_recent = true
   name_regex  = "rhel8-base-\\d.\\d.\\d"
-#  name_regex  = "^${var.service_subtype}-${var.service}-ami-\\d.\\d.\\d"
 
   filter {
     name   = "name"
@@ -49,24 +46,8 @@ data "aws_ami" "rhel8-base" {
   }
 }
 
-data "cloudinit_config" "config" {
-  count = var.instance_count
-
-  gzip          = true
-  base64_encode = true
-
-  part {
-    content_type = "text/cloud-config"
-    content      = templatefile("${path.module}/cloud-init/templates/system-config.yml.tpl", {})
-  }
-
-  part {
-    content_type = "text/cloud-config"
-    content = templatefile("${path.module}/cloud-init/templates/bootstrap-commands.yml.tpl", {
-      instance_hostname = "${var.service_subtype}-${var.service}-${var.environment}-${count.index + 1}"
-      lvm_block_devices = var.lvm_block_devices
-    })
-  }
+data "vault_generic_secret" "account_ids" {
+  path = "aws-accounts/account-ids"
 }
 
 data "vault_generic_secret" "kms_keys" {

@@ -1,9 +1,9 @@
-resource "aws_route53_record" "instance" {
+resource "aws_route53_record" "chips_e2e_pilot" {
   count = var.instance_count
 
-  zone_id = data.aws_route53_zone.chips-e2e-pilot.zone_id
-  name    = "instance-${count.index + 1}.${var.service_subtype}.${var.service}"
+  zone_id = data.aws_route53_zone.private_zone.zone_id
+  name    = "${var.service_subtype}-${count.index + 1}"
   type    = "A"
   ttl     = 300
-  records = [aws_instance.chips-e2e-pilot[count.index].private_ip]
+  records = [aws_instance.chips_e2e_pilot[count.index].private_ip]
 }

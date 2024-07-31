@@ -1,20 +1,19 @@
-variable "hashicorp_vault_role_id" {
-  description = "The role identifier used when retrieving configuration from Hashicorp Vault"
+variable "hashicorp_vault_username" {
+  description = "The username used when retrieving configuration from Hashicorp Vault"
   type = string
 }
 
-variable "hashicorp_vault_secret_id" {
-  description = "The secret identifier used when retrieving configuration from Hashicorp Vault"
+variable "hashicorp_vault_password" {
+  description = "The password used when retrieving configuration from Hashicorp Vault"
   type = string
 }
 
 provider "vault" {
   auth_login {
-    path = "auth/approle/login"
+    path = "auth/userpass/login/${var.hashicorp_vault_username}"
 
     parameters = {
-      role_id   = var.hashicorp_vault_role_id
-      secret_id = var.hashicorp_vault_secret_id
+      password = var.hashicorp_vault_password
     }
   }
 }
