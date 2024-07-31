@@ -36,7 +36,7 @@ Terraform for provisioning the CHIPS E2E environment.
 | [aws_ec2_managed_prefix_list.shared_services_management](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ec2_managed_prefix_list) | data source |
 | [aws_subnet.application](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
 | [aws_subnets.application](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnets) | data source |
-| [aws_vpc.finance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
+| [aws_vpc.heritage](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
 | [vault_generic_secret.account_ids](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/generic_secret) | data source |
 | [vault_generic_secret.internal_cidrs](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/generic_secret) | data source |
 | [vault_generic_secret.kms_keys](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/generic_secret) | data source |
@@ -49,9 +49,9 @@ Terraform for provisioning the CHIPS E2E environment.
 |------|-------------|------|---------|:--------:|
 | <a name="input_ami_version_pattern"></a> [ami_version_pattern](#input\_ami_version_pattern) | The pattern to use when filtering for AMI version by name. | `string` | `"*"` | no |
 | <a name="input_application_subnet_pattern"></a> [application_subnet_pattern](#input\_application_subnet_pattern) | The pattern to use when filtering for application subnets by 'Name' tag. | `string` | `"sub-application-*"` | no |
-| <a name="input_aws_account"></a> [aws_account](#input\_aws_account) | The name of the AWS account (e.g., "finance-development") | `string` | n/a | yes |
+| <a name="input_aws_account"></a> [aws_account](#input\_aws_account) | The name of the AWS account (e.g., "heritage-development") | `string` | n/a | yes |
 | <a name="input_default_log_retention_in_days"></a> [default_log_retention_in_days](#input\_default_log_retention_in_days) | The default log retention period in days to be used for CloudWatch log groups. | `number` | `7` | no |
-| <a name="input_dns_zone_suffix"></a> [dns_zone_suffix](#input\_dns_zone_suffix) | The common DNS hosted zone suffix used across accounts. | `string` | `"finance.aws.internal"` | no |
+| <a name="input_dns_zone_suffix"></a> [dns_zone_suffix](#input\_dns_zone_suffix) | The common DNS hosted zone suffix used across accounts. | `string` | `"heritage.aws.internal"` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | The environment name (e.g., "development", "staging", "live") | `string` | n/a | yes |
 | <a name="input_instance_count"></a> [instance_count](#input\_instance_count) | The number EC2 instances to create. | `number` | n/a | yes |
 | <a name="input_instance_type"></a> [instance_type](#input\_instance_type) | The instance type to use for EC2 instances. | `string` | n/a | yes |
@@ -59,7 +59,7 @@ Terraform for provisioning the CHIPS E2E environment.
 | <a name="input_root_volume_size"></a> [root_volume_size](#input\_root_volume_size) | The size of the root volume in gibibytes (GiB). | `number` | `30` | no |
 | <a name="input_service"></a> [service](#input\_service) | The service name to be used when creating AWS resources. | `string` | `"chips-e2e"` | no |
 | <a name="input_service_subtype"></a> [service_subtype](#input\_service_subtype) | The service subtype name to be used when creating AWS resources. | `string` | `"chips-e2e-pilot"` | no |
-| <a name="input_team"></a> [team](#input\_team) | The team name for ownership of this service. | `string` | `"Finance"` | no |
+| <a name="input_team"></a> [team](#input\_team) | The team name for ownership of this service. | `string` | `"Development"` | no |
 
 ### Vault Authentication Variables
 
