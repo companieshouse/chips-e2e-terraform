@@ -1,11 +1,10 @@
 module "instance_profile" {
-  source = "git@github.com:companieshouse/terraform-modules//aws/instance_profile?ref=tags/1.0.281"
-  name   = "${var.service_subtype}-${var.service}-profile"
+  source = "git@github.com:companieshouse/terraform-modules//aws/instance_profile?ref=tags/1.0.283"
+  name   = local.common_resource_name
 
-  # cw_log_group_arns = "%s:*"
-  enable_ssm        = true
-  # kms_key_refs      = local.instance_profile_kms_key_access_ids
-  # s3_buckets_write  = local.instance_profile_writable_buckets
+  enable_ssm       = true
+  kms_key_refs     = [local.ssm_kms_key_id]
+  s3_buckets_write = [local.session_manager_bucket_name]
 
   custom_statements = [
     {
