@@ -13,6 +13,18 @@ variable "environment" {
   description = "The environment name to be used when provisioning AWS resources."
 }
 
+variable "shared_services_enabled" {
+  type        = bool
+  description = "A boolean value representing whether to enable Shared Services data buckets or not."
+  default     = false
+}
+
+variable "shared_services_read_only_principals" {
+  type        = list(string)
+  description = "An optional list of principal ARNs which will be granted read-only access to Shared Services data buckets and usage of the KMS key for object decryption. Applicable only when 'shared_services_enabled' is true."
+  default     = []
+}
+
 variable "ami_version_pattern" {
   type        = string
   description = "The pattern to use when filtering for AMI version by name."
