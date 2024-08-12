@@ -11,7 +11,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "shared_services" 
 
   rule {
     apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.fil[0].arn
+      kms_master_key_id = aws_kms_key.chips_e2e[0].arn
       sse_algorithm     = "aws:kms"
     }
   }

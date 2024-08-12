@@ -2,7 +2,16 @@ data "aws_ec2_managed_prefix_list" "shared_services_management" {
   name = "shared-services-management-cidrs"
 }
 
-data "aws_iam_policy_document" "fil" {
+data "aws_iam_roles" "sso_administrator" {
+  name_regex  = "AWSReservedSSO_AdministratorAccess.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/${var.region}"
+}
+
+data "aws_iam_user" "concourse" {
+  user_name = "concourse-platform"
+}
+
+data "aws_iam_policy_document" "chips_e2e" {
   count = local.shared_services_count
 
   statement {
@@ -151,7 +160,7 @@ data "aws_iam_policy_document" "shared_services_bucket" {
     condition {
       test     = "StringNotEquals"
       variable = "s3:x-amz-server-side-encryption-aws-kms-key-id"
-      values   = [aws_kms_key.fil[0].arn]
+      values   = [aws_kms_key.chips_e2e[0].arn]
     }
   }
 

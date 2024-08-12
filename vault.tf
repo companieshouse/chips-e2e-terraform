@@ -1,1 +1,1 @@
-vault-providers/userpass
+/groups/chips-e2e-pilot/vault-providers/userpass

@@ -35,7 +35,7 @@ locals {
 
   instance_profile_kms_key_access_ids = flatten([
     local.ssm_kms_key_id,
-    var.shared_services_enabled ? [aws_kms_key.fil[0].key_id] : []
+    var.shared_services_enabled ? [aws_kms_key.chips_e2e[0].key_id] : []
   ])
 
   logs_kms_key_id            = data.vault_generic_secret.kms_keys.data["logs"]
