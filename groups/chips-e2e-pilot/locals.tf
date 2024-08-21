@@ -13,6 +13,9 @@ locals {
 
   security_s3_data            = data.vault_generic_secret.security_s3_buckets.data
   session_manager_bucket_name = local.security_s3_data.session-manager-bucket-name
+  shared_services_s3_data     = data.vault_generic_secret.shared_services_s3.data
+  resources_bucket_name       = local.shared_services_s3_data["resources_bucket_name"]
+
 
   security_kms_keys_data = data.vault_generic_secret.security_kms_keys.data
   ssm_kms_key_id         = local.security_kms_keys_data.session-manager-kms-key-arn
