@@ -4,7 +4,11 @@ module "instance_profile" {
 
   enable_ssm       = true
   kms_key_refs     = [local.ssm_kms_key_id]
-  s3_buckets_write = [local.session_manager_bucket_name]
+  s3_buckets_write = [
+    local.session_manager_bucket_name,
+    local.resources_bucket_name
+    ]
+  s3_buckets_read  = [local.resources_bucket_name]
 
   custom_statements = [
     {
